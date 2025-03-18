@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 
 // Cadena de conexión a MongoDB
-const mongoURI = 'mongodb+srv://albertuu9:Montady95@app.sghh9.mongodb.net/app?retryWrites=true&w=majority';  // Cambia esto por tu URI de MongoDB
+const mongoURI = process.env.MONGO_URI;  // Cambia esto por tu URI de MongoDB
 
 const connectDB = async () => {
   try {

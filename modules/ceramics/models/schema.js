@@ -4,14 +4,17 @@ const mongoose = require('mongoose');
 const ceramicsSchema = new mongoose.Schema({
   ce_id: { type: Number, unique: true },
   ce_title: { type: String, required: true },
-  ce_description: { type: String},
-  ce_img_schedule: { type: String},
+  ce_description: { type: String, required: true},
+  ce_img_schedule: { type: String, required: true},
   ce_location: { type: String},
-  ce_creation_date: { type: String, required: true },
-  ce_category: { type: String},
-  ce_measures: { type: String},
+  ce_creation_date: { type: String },
+  ce_typology: { type: Number, required: true},
+  ce_measures: { type: Object},
   ce_school: { type: String},
   ce_image: { type: String},
+  ce_property: { type: String},
+  ce_iconographic_elements: { type: Array, required: true},
+  ce_musical_instruments: { type: Array, required: true},
 });
 
 // Middleware para asignar ce_id

@@ -1,12 +1,23 @@
 const express = require('express');
 const Ceramics = require('../models/schema'); // Modelo Ceramics
 const router = express.Router();
+const upload = require('../../config/multer-config');
+const { uploadToCloudinary } = require('../../config/cloudinary');
 
 // Crear una nueva cerámica
-router.post('/add', async (req, res) => {
+router.post('/save', upload.single('image'), async (req, res) => {
   try {
+    let imageUrl = null;
+
+    // Verificar si se ha enviado un archivo
+    if (req.file) {
+      imageUrl = await uploadToCloudinary(req.file.buffer); // Subir imagen a Cloudinary
+    }
+
+    // Agregar la URL de la imagen a los datos del cuerpo
+    req.body.ce_img_schedule = imageUrl;
+
     const newCeramic = new Ceramics(req.body);
-    console.log('req', req.body);
     const savedCeramic = await newCeramic.save();
     res.status(201).json(savedCeramic);
   } catch (err) {
