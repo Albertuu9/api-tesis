@@ -14,6 +14,21 @@ router.post('/save', upload.single('image'), async (req, res) => {
       imageUrl = await uploadToCloudinary(req.file.buffer); // Subir imagen a Cloudinary
     }
 
+    if (req.body.ce_iconographic_elements) {
+      const arrayData = req.body.ce_iconographic_elements.split(',');
+      req.body.ce_iconographic_elements = arrayData;
+    }
+
+    if (req.body.ce_musical_instruments) {
+      const arrayData = req.body.ce_musical_instruments.split(',');
+      req.body.ce_musical_instruments = arrayData;
+      console.log('req.body.ce_musical_instruments', arrayData);
+    }
+
+    if (req.body.ce_measures) {
+      req.body.ce_measures = JSON.parse(req.body.ce_measures);
+    }
+
     // Agregar la URL de la imagen a los datos del cuerpo
     req.body.ce_img_schedule = imageUrl;
 
@@ -30,7 +45,7 @@ router.post('/save', upload.single('image'), async (req, res) => {
 router.post('/get', async (req, res) => {
   try {
     const ceramics = await Ceramics.find();
-    res.status(200).json(ceramics);
+    res.status(200).json({data: ceramics, message: 'Cerámicas obtenidas correctamente', code: 200});
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error al obtener cerámicas' });
@@ -44,7 +59,7 @@ router.post('/get/:id', async (req, res) => {
     if (!ceramic) {
       return res.status(404).json({ error: 'Cerámica no encontrada' });
     }
-    res.status(200).json(ceramic);
+    res.status(200).json({data: ceramic, message: 'Cerámicas obtenidas correctamente', code: 200});
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error al obtener la cerámica' });

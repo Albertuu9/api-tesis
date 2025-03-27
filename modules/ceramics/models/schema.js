@@ -9,12 +9,16 @@ const ceramicsSchema = new mongoose.Schema({
   ce_location: { type: String},
   ce_creation_date: { type: String },
   ce_typology: { type: Number, required: true},
-  ce_measures: { type: Object},
+  ce_measures: {
+    height: { type: Number, default: 0 },
+    diameter: { type: Number, default: 0 },
+    circumference: { type: Number, default: 0 }
+  },
   ce_school: { type: String},
   ce_image: { type: String},
   ce_property: { type: String},
-  ce_iconographic_elements: { type: Array, required: true},
-  ce_musical_instruments: { type: Array, required: true},
+  ce_iconographic_elements: [{ type: String, required: true }],
+  ce_musical_instruments: [{ type: String, required: true }]
 });
 
 // Middleware para asignar ce_id
