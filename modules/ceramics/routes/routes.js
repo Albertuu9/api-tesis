@@ -10,8 +10,10 @@ router.post('/save', upload.single('image'), async (req, res) => {
     let imageUrl = null;
 
     // Verificar si se ha enviado un archivo
-    if (req.file) {
+    if (req.file && !req.ce_img_schedule) {
       imageUrl = await uploadToCloudinary(req.file.buffer); // Subir imagen a Cloudinary
+      // Agregar la URL de la imagen a los datos del cuerpo
+      req.body.ce_img_schedule = imageUrl;
     }
 
     if (req.body.ce_iconographic_elements) {
@@ -22,19 +24,33 @@ router.post('/save', upload.single('image'), async (req, res) => {
     if (req.body.ce_musical_instruments) {
       const arrayData = req.body.ce_musical_instruments.split(',');
       req.body.ce_musical_instruments = arrayData;
-      console.log('req.body.ce_musical_instruments', arrayData);
     }
 
     if (req.body.ce_measures) {
       req.body.ce_measures = JSON.parse(req.body.ce_measures);
     }
 
-    // Agregar la URL de la imagen a los datos del cuerpo
-    req.body.ce_img_schedule = imageUrl;
-
-    const newCeramic = new Ceramics(req.body);
-    const savedCeramic = await newCeramic.save();
-    res.status(201).json(savedCeramic);
+    if(req.body && req.body.ce_id) {
+      // Si existe ce_id, actualizar la cerámica
+      const updatedCeramic = await Ceramics.findOneAndUpdate(
+        { ce_id: req.body.ce_id },  // Condición de búsqueda
+        req.body,                   // Datos nuevos
+        { new: true, runValidators: true } // Retorna el objeto actualizado y valida datos
+      );
+      if (!updatedCeramic) {
+        return res.status(404).json({ message: 'Cerámica no encontrada', code: 404 });
+      }
+      res.status(201).json({
+        message: 'Ceramic updated successfull'
+      });
+    } else {
+      const newCeramic = new Ceramics(req.body);
+      await newCeramic.save();
+      res.status(201).json({
+        message: 'Ceramic saved successfull'
+      });
+    }
+    
   } catch (err) {
     console.error(err);
     res.status(400).json({ error: 'Error al crear cerámica' });
@@ -44,7 +60,22 @@ router.post('/save', upload.single('image'), async (req, res) => {
 // Obtener todas las cerámicas
 router.post('/get', async (req, res) => {
   try {
-    const ceramics = await Ceramics.find();
+    const ceramics = await Ceramics.aggregate([
+      {
+        $lookup: {
+          from: 'typologies',  // Nombre de la colección en MongoDB
+          localField: 'ce_typology', // Campo en Ceramics que almacena el ID de la tipología
+          foreignField: 'ty_id', // Campo en Typologies que contiene el ID real
+          as: 'typology' // Nombre del campo donde se guardará la relación
+        }
+      },
+      {
+        $unwind: {
+          path: '$typology',
+          preserveNullAndEmptyArrays: true // Evita errores si no hay coincidencia
+        }
+      }
+    ]);
     res.status(200).json({data: ceramics, message: 'Cerámicas obtenidas correctamente', code: 200});
   } catch (err) {
     console.error(err);
