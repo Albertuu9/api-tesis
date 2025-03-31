@@ -30,7 +30,7 @@ router.post('/save', upload.single('image'), async (req, res) => {
       req.body.ce_measures = JSON.parse(req.body.ce_measures);
     }
 
-    if(req.body && req.body.ce_id) {
+    if(req.body && req.body.ce_id && req.body.ce_id > 0) {
       // Si existe ce_id, actualizar la cerámica
       const updatedCeramic = await Ceramics.findOneAndUpdate(
         { ce_id: req.body.ce_id },  // Condición de búsqueda
