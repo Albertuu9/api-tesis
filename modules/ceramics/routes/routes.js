@@ -29,7 +29,7 @@ router.post('/save', upload.single('image'), async (req, res) => {
     if (req.body.ce_measures) {
       req.body.ce_measures = JSON.parse(req.body.ce_measures);
     }
-
+    // Actualizar cerámica por ID
     if(req.body && req.body.ce_id && req.body.ce_id > 0) {
       // Si existe ce_id, actualizar la cerámica
       const updatedCeramic = await Ceramics.findOneAndUpdate(
@@ -97,32 +97,16 @@ router.post('/get/:id', async (req, res) => {
   }
 });
 
-// Actualizar cerámica por ID
-router.post('/update/:id', async (req, res) => {
-  try {
-    const updatedCeramic = await Ceramics.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true } // Devolver el documento actualizado
-    );
-    if (!updatedCeramic) {
-      return res.status(404).json({ error: 'Cerámica no encontrada' });
-    }
-    res.status(200).json(updatedCeramic);
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: 'Error al actualizar cerámica' });
-  }
-});
-
 // Eliminar cerámica por ID
-router.post('/delete/:id', async (req, res) => {
+router.post('/delete', async (req, res) => {
   try {
-    const deletedCeramic = await Ceramics.findByIdAndDelete(req.params.id);
-    if (!deletedCeramic) {
+    const deletedCeramic = await Ceramics.deleteOne({ ce_id: req.body.ce_id });
+
+    if (deletedCeramic.deletedCount === 0) {
       return res.status(404).json({ error: 'Cerámica no encontrada' });
     }
-    res.status(200).json({ message: 'Cerámica eliminada' });
+
+    res.status(200).json({ message: 'Cerámica eliminada correctamente' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error al eliminar cerámica' });
