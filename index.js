@@ -1,7 +1,8 @@
 const express = require('express');
 const connectDB = require('./modules/config/db');
 const app = express();
-const port = 7777;
+require('dotenv').config();
+const port = process.env.PORT;
 const bodyParser = require('body-parser');
 const ceramicsRoutes = require('./modules/ceramics/routes/routes'); // Rutas CRUD
 const cors = require('cors');
@@ -20,7 +21,7 @@ connectDB();
 app.use(bodyParser.json()); // Para manejar los cuerpos de las solicitudes en formato JSON
 
 // Rutas
-app.use('/api/ceramics', ceramicsRoutes); // Ruta para las operaciones CRUD
+app.use('/ceramics', ceramicsRoutes); // Ruta para las operaciones CRUD
 
 // Iniciar servidor
 app.listen(port, () => {
