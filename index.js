@@ -4,7 +4,6 @@ const app = express();
 const port = 7777;
 const bodyParser = require('body-parser');
 const ceramicsRoutes = require('./modules/ceramics/routes/routes'); // Rutas CRUD
-const typologiesRoutes = require('./modules/typologies/routes/routes');
 const cors = require('cors');
 
 // Middleware para parsear datos JSON y URL
@@ -22,7 +21,6 @@ app.use(bodyParser.json()); // Para manejar los cuerpos de las solicitudes en fo
 
 // Rutas
 app.use('/api/ceramics', ceramicsRoutes); // Ruta para las operaciones CRUD
-app.use('/api/typologies', typologiesRoutes);
 
 // Iniciar servidor
 app.listen(port, () => {

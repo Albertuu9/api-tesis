@@ -16,6 +16,7 @@ router.post('/save', upload.single('image'), async (req, res) => {
       req.body.ce_img_schedule = imageUrl;
     }
 
+    // guardar arrays
     if (req.body.ce_iconographic_elements) {
       const arrayData = req.body.ce_iconographic_elements.split(',');
       req.body.ce_iconographic_elements = arrayData;
@@ -24,6 +25,23 @@ router.post('/save', upload.single('image'), async (req, res) => {
     if (req.body.ce_musical_instruments) {
       const arrayData = req.body.ce_musical_instruments.split(',');
       req.body.ce_musical_instruments = arrayData;
+    }
+
+    // guardar objetos
+    if (req.body.ce_material) {
+      req.body.ce_material = JSON.parse(req.body.ce_material);
+    }
+
+    if (req.body.ce_origin) {
+      req.body.ce_origin = JSON.parse(req.body.ce_origin);
+    }
+
+    if (req.body.ce_painted) {
+      req.body.ce_painted = JSON.parse(req.body.ce_painted);
+    }
+
+    if (req.body.ce_technique) {
+      req.body.ce_technique = JSON.parse(req.body.ce_technique);
     }
 
     if (req.body.ce_measures) {
@@ -60,23 +78,13 @@ router.post('/save', upload.single('image'), async (req, res) => {
 // Obtener todas las cerámicas
 router.post('/get', async (req, res) => {
   try {
-    const ceramics = await Ceramics.aggregate([
-      {
-        $lookup: {
-          from: 'typologies',  // Nombre de la colección en MongoDB
-          localField: 'ce_typology', // Campo en Ceramics que almacena el ID de la tipología
-          foreignField: 'ty_id', // Campo en Typologies que contiene el ID real
-          as: 'typology' // Nombre del campo donde se guardará la relación
-        }
-      },
-      {
-        $unwind: {
-          path: '$typology',
-          preserveNullAndEmptyArrays: true // Evita errores si no hay coincidencia
-        }
-      }
-    ]);
-    res.status(200).json({data: ceramics, message: 'Cerámicas obtenidas correctamente', code: 200});
+    const ceramics = await Ceramics.find(); // Trae todas las cerámicas
+
+    res.status(200).json({
+      data: ceramics,
+      message: 'Cerámicas obtenidas correctamente',
+      code: 200
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error al obtener cerámicas' });
